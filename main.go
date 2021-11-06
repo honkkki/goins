@@ -3,16 +3,17 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/honkkki/goins/cache"
 	"github.com/honkkki/goins/insmodel"
-	"github.com/honkkki/goins/utils"
+	"github.com/honkkki/goins/logic"
 	"io/ioutil"
 	"log"
 	"net/http"
 )
 
 func main() {
-	// get url from cmd
 	for {
+		// get url from cmd
 		var input string
 		_, err := fmt.Scanln(&input)
 		if err != nil {
@@ -30,7 +31,7 @@ func main() {
 		req, _ := http.NewRequest("GET", url, nil)
 
 		// get cookie from redis
-		cookie, err := utils.GetCookie()
+		cookie, err := cache.GetCookie()
 		if err != nil {
 			fmt.Println("cant get ins cookie:", err)
 			return
@@ -44,13 +45,13 @@ func main() {
 			log.Fatal(err)
 		}
 
-		defer resp.Body.Close()
 		if code := resp.StatusCode; code != 200 {
 			fmt.Println("response http code error:", code)
 			return
 		}
 
 		data, _ := ioutil.ReadAll(resp.Body)
+		resp.Body.Close()
 
 		ig := insmodel.IG{}
 		err = json.Unmarshal(data, &ig)
@@ -67,6 +68,6 @@ func main() {
 			imgMap[v.Node.ID] = v.Node.DisplayURL
 		}
 
-		utils.Save(imgMap, imgUsername)
+		logic.Save(imgMap, imgUsername)
 	}
 }

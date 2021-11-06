@@ -1,6 +1,8 @@
-package utils
+package cache
 
-import "testing"
+import (
+	"testing"
+)
 
 func BenchmarkGetCookie(b *testing.B) {
 	for i := 0; i < b.N; i++ {
