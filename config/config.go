@@ -40,6 +40,10 @@ func GetRoot() {
 			return
 		}
 
+		if wd == filepath.Dir(wd) {
+			log.Fatal("config.yaml not found.")
+		}
+
 		recur(filepath.Dir(wd))
 	}
 
