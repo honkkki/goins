@@ -2,7 +2,7 @@
 
 🍦
 
-Command-line project to download ins images
+Command-line project to download images.
 
 - redis
 - viper
