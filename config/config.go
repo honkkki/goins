@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"github.com/honkkki/goins/utils"
 	"github.com/spf13/viper"
 	"log"
@@ -9,10 +8,23 @@ import (
 	"path/filepath"
 )
 
-var rootDir string
+var (
+	rootDir string
+	vip *viper.Viper
+)
 
 func init()  {
 	GetRoot()
+	if vip == nil {
+		vip = viper.New()
+		vip.SetConfigFile(rootDir + "/config.yaml")
+	}
+
+	err := vip.ReadInConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+	vip.WatchConfig()
 }
 
 func GetRoot() {
@@ -23,7 +35,7 @@ func GetRoot() {
 
 	var recur func(wd string)
 	recur = func(wd string) {
-		if utils.Exist(wd + "/utils") {
+		if utils.Exist(wd + "/config.yaml") {
 			rootDir = wd
 			return
 		}
@@ -35,12 +47,12 @@ func GetRoot() {
 }
 
 func GetSavePath() string {
-	fmt.Println(rootDir)
-	viper.SetConfigFile(rootDir + "/config.yaml")
-	err := viper.ReadInConfig()
-	if err != nil {
-		log.Fatal(err)
-	}
-	viper.WatchConfig()
-	return viper.GetString("file.path")
+	return vip.GetString("file.path")
+}
+
+func GetRedisConfig() map[string]string{
+	m := make(map[string]string)
+	m["host"] = vip.GetString("redis.host")
+	m["port"] = vip.GetString("redis.port")
+	return m
 }

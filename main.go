@@ -14,10 +14,12 @@ import (
 func main() {
 	for {
 		// get url from cmd
+		fmt.Println("type url:")
 		var input string
 		_, err := fmt.Scanln(&input)
 		if err != nil {
-			log.Fatal("get url failed: ", err)
+			log.Println("get url failed:", err)
+			continue
 		}
 
 		if input == "q" {
@@ -60,12 +62,21 @@ func main() {
 			return
 		}
 
-		//fmt.Println(ig.Graphql.ShortcodeMedia.EdgeSidecarToChildren.Edges[0].Node.DisplayURL)
-		imgResource := ig.Graphql.ShortcodeMedia.EdgeSidecarToChildren.Edges
-		imgUsername := ig.Graphql.ShortcodeMedia.Owner.Username
 		imgMap := make(map[string]string)
-		for _, v := range imgResource {
-			imgMap[v.Node.ID] = v.Node.DisplayURL
+		imgUsername := ig.Graphql.ShortcodeMedia.Owner.Username
+		resType := ig.Graphql.ShortcodeMedia.Typename
+
+		switch resType {
+		case "GraphImage":
+			imgMap[ig.Graphql.ShortcodeMedia.ID] = ig.Graphql.ShortcodeMedia.DisplayURL
+		case "GraphSidecar":
+			imgResource := ig.Graphql.ShortcodeMedia.EdgeSidecarToChildren.Edges
+			for _, v := range imgResource {
+				imgMap[v.Node.ID] = v.Node.DisplayURL
+			}
+		default:
+			log.Println("error resource type.")
+			continue
 		}
 
 		logic.Save(imgMap, imgUsername)
