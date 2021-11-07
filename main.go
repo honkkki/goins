@@ -27,7 +27,13 @@ func main() {
 			break
 		}
 
-		url := input + "?__a=1"
+		tag, err := cache.GetTag()
+		if err != nil {
+			fmt.Println("cant get tag:", err)
+			return
+		}
+
+		url := input + tag
 		fmt.Println("fetching url...")
 		client := &http.Client{}
 		req, _ := http.NewRequest("GET", url, nil)

@@ -33,7 +33,16 @@ func GetCookie() (ret string, err error) {
 	if r == nil {
 		return "", errors.New("redis init failed")
 	}
-	
+
 	ret, err = redis.String(r.Do("get", "ins-cookie"))
+	return
+}
+
+func GetTag() (ret string, err error) {
+	if r == nil {
+		return "", errors.New("redis init failed")
+	}
+
+	ret, err = redis.String(r.Do("get", "tag"))
 	return
 }
