@@ -10,15 +10,13 @@ import (
 
 var (
 	rootDir string
-	vip *viper.Viper
+	vip     *viper.Viper
 )
 
-func init()  {
+func init() {
 	GetRoot()
-	if vip == nil {
-		vip = viper.New()
-		vip.SetConfigFile(rootDir + "/config.yaml")
-	}
+	vip = viper.New()
+	vip.SetConfigFile(rootDir + "/config.yaml")
 
 	err := vip.ReadInConfig()
 	if err != nil {
@@ -54,7 +52,7 @@ func GetSavePath() string {
 	return vip.GetString("file.path")
 }
 
-func GetRedisConfig() map[string]string{
+func GetRedisConfig() map[string]string {
 	m := make(map[string]string)
 	m["host"] = vip.GetString("redis.host")
 	m["port"] = vip.GetString("redis.port")
