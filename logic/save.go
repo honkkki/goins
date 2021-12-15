@@ -2,22 +2,25 @@ package logic
 
 import (
 	"fmt"
-	"github.com/honkkki/goins/config"
-	"github.com/honkkki/goins/utils"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"sync"
+
+	"github.com/honkkki/goins/config"
+	"github.com/honkkki/goins/utils"
 )
 
 func Save(resource map[string]string, username string) {
+	log.Println(resource)
 	baseDir := config.GetSavePath()
 	dir := filepath.Join(baseDir, username)
 
 	if !utils.Exist(dir) {
 		// create dir
-		os.Mkdir(dir, 0644)
+		os.Mkdir(dir, 0777)
 	}
 
 	var wg sync.WaitGroup
@@ -27,7 +30,11 @@ func Save(resource map[string]string, username string) {
 	for k, v := range resource {
 		go func(id string, url string) {
 			defer wg.Done()
-			res, _ := http.Get(url)
+			res, err := http.Get(url)
+			if err != nil {
+				log.Println(err)
+				return
+			}
 			defer res.Body.Close()
 			stream, _ := ioutil.ReadAll(res.Body)
 			fileName := id + ".jpg"
